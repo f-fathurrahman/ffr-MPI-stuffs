@@ -1,2 +1,3 @@
 #!/bin/bash
-rm -v *.x
+rm -fv a.out
+rm -fv *.x
