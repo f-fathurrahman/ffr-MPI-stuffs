@@ -1,0 +1,16 @@
+ Ndata_loc =            5
+ my_rank, istart, iend =            0           1           5
+ my_rank, istart, iend =            1           6          10
+ my_rank, i, vec1, vec2:    0   1      0.0200000000     -0.0300000000
+ my_rank, i, vec1, vec2:    0   2      0.0400000000     -0.0600000000
+ my_rank, i, vec1, vec2:    0   3      0.0600000000     -0.0900000000
+ my_rank, i, vec1, vec2:    0   4      0.0800000000     -0.1200000000
+ my_rank, i, vec1, vec2:    0   5      0.1000000000     -0.1500000000
+ my_rank, result =            0  0.000000000000000E+000
+ res =   0.000000000000000E+000
+ my_rank, i, vec1, vec2:    1   6      0.1200000000     -0.1800000000
+ my_rank, i, vec1, vec2:    1   7      0.1400000000     -0.2100000000
+ my_rank, i, vec1, vec2:    1   8      0.1600000000     -0.2400000000
+ my_rank, i, vec1, vec2:    1   9      0.1800000000     -0.2700000000
+ my_rank, i, vec1, vec2:    1  10      0.2000000000     -0.3000000000
+ my_rank, result =            1  0.000000000000000E+000
