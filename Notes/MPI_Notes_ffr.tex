@@ -37,19 +37,19 @@ Apakah \textit{message passing interface} tersebut?
 \section{Program sederhana}
 
 Mari kita mulai dengan program yang sederhana:
+\inputminted[breaklines,fontsize=\footnotesize]{fortran}{progs/01_simple.f90}
+
+Perhatikan bahwa:
 \begin{fortrancode}
-PROGRAM simple01
-  IMPLICIT NONE
-  USE 'mpi.h'
-  INTEGER :: rank, Nprocs, ierr
-  CALL MPI_Init(ierr)
-  CALL MPI_Comm_size(MPI_COMM_WORLD, Nprocs, ierr)
-  CALL MPI_Comm_rank(MPI_COMM_WORLD, rank, ierr)
-  WRITE(*,*) 'Hello, I am proc: ', rank, ' from ', Nprocs, ' total processes'
-  CALL MPI_Finalize(ierr)
-END PROGRAM
+IMPLICIT NONE
+USE 'mpi.h'
 \end{fortrancode}
 
+Cara yang lebih modern, yaitu dengan menggunakan modul.
+\begin{fortrancode}
+USE mpi
+IMPLICIT NONE
+\end{fortrancode}
 
 \end{document}
 

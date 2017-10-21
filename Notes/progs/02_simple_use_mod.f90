@@ -1,6 +1,6 @@
 PROGRAM simple
+  USE mpi
   IMPLICIT NONE
-  INCLUDE 'mpif.h'
   INTEGER :: rank, Nprocs, ierr
   CALL MPI_Init(ierr)
   CALL MPI_Comm_size(MPI_COMM_WORLD, Nprocs, ierr)
