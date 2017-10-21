@@ -1,0 +1,49 @@
+\documentclass[bahasa,a4paper,12pt]{extarticle}
+\usepackage[a4paper]{geometry}
+\geometry{verbose,tmargin=1.5cm,bmargin=1.5cm,lmargin=1cm,rmargin=1cm}
+
+\setlength{\parskip}{\smallskipamount}
+\setlength{\parindent}{0pt}
+
+\usepackage{fontspec}
+\defaultfontfeatures{Ligatures=TeX}
+\setmainfont{Linux Libertine O}
+
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{babel}
+
+\usepackage{minted}
+\newminted{fortran}{breaklines,fontsize=\footnotesize,texcomments=true}
+\newminted{C}{breaklines,fontsize=\footnotesize}
+
+\definecolor{mintedbg}{rgb}{0.95,0.95,0.95}
+\usepackage{mdframed}
+
+
+\begin{document}
+
+
+\title{Pengenalan Message Passing Interface (MPI)}
+\author{Fadjar Fathurrahman}
+\maketitle
+
+\section{Pendahuluan}
+
+Apakah \textit{message passing interface} tersebut?
+
+
+\section{Program sederhana}
+
+Mari kita mulai dengan program yang sederhana:
+\begin{fortrancode}
+PROGRAM simple01
+  IMPLICIT NONE
+END PROGRAM
+\end{fortrancode}
+
+
+\end{document}
+
+
