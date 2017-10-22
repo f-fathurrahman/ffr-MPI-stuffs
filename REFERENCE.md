@@ -5,7 +5,7 @@ The old way:
 ```fortran
 PROGRAM my_mpi_program
   IMPLICIT NONE
-  include 'mpif.h'
+  INCLUDE 'mpif.h'
   ! rest of the program  ...
 END PROGRAM
 ```
@@ -47,21 +47,29 @@ CALL MPI_Comm_size( comm, Nprocs, ierr )
 ```fortran
 INTEGER :: ierr
 INTEGER :: rank
-MPI_COMM :: MPI_COMM_WORLD
+MPI_COMM :: comm
 CALL MPI_Comm_rank( comm, rank, ierr )
 ```
 
 ## Point-to-point communication
 
-Sending data
+### Sending data
 
 ```fortran
-MPI_Send()
+<type> :: buf(*)
+INTEGER :: count, datatype, dest, tag, comm, ierr
+MPI_Send( buf, count, datatype, dest, tag, comm, ierr )
 ```
 
-Receiving data
+### Receiving data
 
 ```fortran
-MPI_Recv()
+<type> :: buf(*)
+INTEGER :: count, datatype, source, tag, comm, ierr
+INTEGER :: stat(MPI_STATUS_SIZE)
+MPI_Recv( buf, count, datatype, source, tag, comm, stat, ierr )
 ```
+
+`stat` object can be used to determine parameters that have not been
+fixed by the call's argument.
 
