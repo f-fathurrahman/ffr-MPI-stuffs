@@ -1,0 +1,133 @@
+\documentclass[bahasa,a4paper,12pt]{extarticle}
+\usepackage[a4paper]{geometry}
+\geometry{verbose,tmargin=1.5cm,bmargin=1.5cm,lmargin=2.5cm,rmargin=2.5cm}
+
+\setlength{\parskip}{\smallskipamount}
+\setlength{\parindent}{0pt}
+
+\usepackage{mathptmx}
+
+%\usepackage{fontspec}
+%\defaultfontfeatures{Ligatures=TeX}
+%\setmainfont{Linux Libertine O}
+
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{babel}
+
+\usepackage{minted}
+\newminted{fortran}{breaklines,fontsize=\footnotesize}
+\newminted{text}{breaklines,fontsize=\footnotesize}
+\newminted{C}{breaklines,fontsize=\footnotesize}
+
+\definecolor{mintedbg}{rgb}{0.95,0.95,0.95}
+\usepackage{mdframed}
+
+\BeforeBeginEnvironment{minted}{\begin{mdframed}[backgroundcolor=mintedbg]}
+\AfterEndEnvironment{minted}{\end{mdframed}}
+
+\begin{document}
+
+\title{%
+  \large Pemrograman Paralel dengan Message Passing Interface (MPI) \\
+  \Large Modul 1: Pengenalan MPI}
+\author{Fadjar Fathurrahman}
+\date{}
+\maketitle
+
+\section{Tujuan}
+\begin{enumerate}
+\item mengenal MPI and berbagai macam implementasinya
+\item mampu membuat program paralel sederhana dengan MPI
+\end{enumerate}
+
+\section{Perangkat lunak yang diperlukan}
+\begin{itemize}
+\item Komputer multicore atau kluster.
+\item Kompiler MPI (Open MPI)
+\end{itemize}
+
+\section{Pendahuluan}
+
+Apakah \textit{message passing interface} tersebut?
+
+Perbandingan dengan paradigma pemrograman paralel yang lain.
+
+
+\section{Program sederhana}
+
+Mari kita mulai dengan program yang sederhana:
+\inputminted[breaklines,fontsize=\footnotesize]{fortran}{codes/f90/01_simple.f90}
+
+Perhatikan bahwa:
+\begin{fortrancode}
+IMPLICIT NONE
+USE 'mpi.h'
+\end{fortrancode}
+
+Cara yang lebih modern, yaitu dengan menggunakan modul.
+\begin{fortrancode}
+USE mpi
+IMPLICIT NONE
+\end{fortrancode}
+
+Bangun program dengan menggunakan perintah:
+\begin{textcode}
+mpifort 01_simple.f90 -o 01_simple.x
+\end{textcode}
+
+Program dapat dijalankan dengan menggunakan perintah
+\begin{textcode}
+mpirun -np ./01_simple.x
+\end{textcode}
+
+Contoh keluaran program (menggunakan 2 proses):
+\begin{textcode}
+efefer:f90$ mpirun -np 2 ./01_simple.x 
+ Hello, I am proc:            1  from            2  total processes
+ Hello, I am proc:            0  from            2  total processes
+\end{textcode}
+
+Setiap program MPI harus diawali dengan pemanggilan fungsi
+\verb|MPI_Init()| dan diakhiri dengan \verb|MPI_Finalize()|.
+\begin{fortrancode}
+CALL MPI_Init(ierr)
+! ... kode perhitungan di sini
+CALL MPI_Finalize(ierr)
+\end{fortrancode}
+Dalam Fortran, dua fungsi tersebut memerlukan satu argumen yaitu \verb|ierr|
+yang bertipe \verb|INTEGER|.
+
+Dua fungsi lain yang akan sering kita gunakan adalah \verb|MPI_Comm_size()|
+dan \verb|MPI_Comm_rank()|.
+\begin{fortrancode}
+CALL MPI_Comm_size(MPI_COMM_WORLD, Nprocs, ierr)
+CALL MPI_Comm_rank(MPI_COMM_WORLD, rank, ierr)
+\end{fortrancode}
+
+\verb|MPI_Comm_size()| digunakan untuk memperoleh informasi mengenai jumlah
+proses yang digunakan pada suatu komunikator MPI.
+
+\verb|MPI_Comm_rank()| digunakan untuk memperoleh informasi mengenai rank
+dari proses yang sedang berjalan pada suatu komunikator MPI.
+
+Apa yang terjadi jika kita memesan jumlah prosesor yang lebih banyak
+daripada jumlah prosesor yang ada pada sistem kita?
+\begin{textcode}
+efefer:f90$ mpirun -np 3 ./01_simple.x 
+--------------------------------------------------------------------------
+There are not enough slots available in the system to satisfy the 3 slots
+that were requested by the application:
+  ./01_simple.x
+
+Either request fewer slots for your application, or make more slots available
+for use.
+--------------------------------------------------------------------------
+\end{textcode}
+
+
+
+\end{document}
+
+
