@@ -1,3 +1,6 @@
+TEMP_*
+OLD_*
+
 *.swp
 *.swo
 *~
