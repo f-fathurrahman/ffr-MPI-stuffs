@@ -1,7 +1,6 @@
 #include <petsc.h>
 
 int main(int argc, char **argv) {
-  
   PetscErrorCode ierr;
   
   int rank, i;
