@@ -3,7 +3,6 @@
 PETSC_DIR=/opt/petsc-3.11.3_openmpi-2.2.1_debug
 
 LINK1="-Wl,-rpath,$PETSC_DIR/lib: $PETSC_DIR/lib/libpetsc.so"
-echo $LINK1
 
 if [ "$#" -eq 1 ]; then
 
