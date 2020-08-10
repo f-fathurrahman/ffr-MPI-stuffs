@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PETSC_DIR=/opt/petsc-3.11.3_openmpi-2.2.1_debug
+PETSC_DIR=/opt/petsc-3.13.0_openmpi-2.1.1_debug
 
 LINK1="-Wl,-rpath,$PETSC_DIR/lib: $PETSC_DIR/lib/libpetsc.so"
 
