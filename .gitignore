@@ -1,5 +1,6 @@
 TEMP_*
 OLD_*
+ORIG_*
 
 *.swp
 *.swo
