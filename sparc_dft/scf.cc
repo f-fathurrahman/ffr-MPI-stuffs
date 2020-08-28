@@ -1,35 +1,19 @@
-/*=============================================================================================
-  | Simulation Package for Ab-initio Real-space Calculations (SPARC) 
-  | Copyright (C) 2016 Material Physics & Mechanics Group at Georgia Tech.
-  |
-  | S. Ghosh, P. Suryanarayana, SPARC: Accurate and efficient finite-difference formulation and
-  | parallel implementation of Density Functional Theory. Part I: Isolated clusters, Computer
-  | Physics Communications
-  | S. Ghosh, P. Suryanarayana, SPARC: Accurate and efficient finite-difference formulation and
-  | parallel implementation of Density Functional Theory. Part II: Periodic systems, Computer
-  | Physics Communications  
-  |
-  | file name: scf.cc          
-  |
-  | Description: This file contains the functions required for self consistent field iteration
-  | and subspace projection
-  |
-  | Authors: Swarnava Ghosh, Phanish Suryanarayana
-  |
-  | Last Modified: 2/18/2016   
-  |-------------------------------------------------------------------------------------------*/
 #include "sddft.h"
 #include "petscsys.h"
 #include <cmath>
+
 #include "mkl_lapacke.h"
 #include "mkl.h"
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
+
 using namespace std;
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //                        SelfConsistentField: Self Consistent Field iteration               // 
 ///////////////////////////////////////////////////////////////////////////////////////////////
+
 PetscScalar SelfConsistentField(SDDFT_OBJ* pSddft)
 {
   

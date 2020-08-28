@@ -1,23 +1,3 @@
-/*=============================================================================================
-  | Simulation Package for Ab-initio Real-space Calculations (SPARC) 
-  | Copyright (C) 2016 Material Physics & Mechanics Group at Georgia Tech.
-  |
-  | S. Ghosh, P. Suryanarayana, SPARC: Accurate and efficient finite-difference formulation and
-  | parallel implementation of Density Functional Theory. Part I: Isolated clusters, Computer
-  | Physics Communications
-  | S. Ghosh, P. Suryanarayana, SPARC: Accurate and efficient finite-difference formulation and
-  | parallel implementation of Density Functional Theory. Part II: Periodic systems, Computer
-  | Physics Communications  
-  |
-  | file name: ExchangeCorrelation.cc          
-  |
-  | Description: This file contains the functions required for calculation of exchange 
-  | correlation potential and energy 
-  |
-  | Authors: Swarnava Ghosh, Phanish Suryanarayana, Deepa Phanish
-  |
-  | Last Modified: 2/26/2016   
-  |-------------------------------------------------------------------------------------------*/
 #include "sddft.h"
 #include "petscsys.h"
 #include "math.h"

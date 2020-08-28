@@ -15,7 +15,8 @@ int main( int argc, char **argv )
   PetscLogDouble t1, t2, elapsed_time;
   
   PetscInitialize(&argc, &argv, (char*)0, help);
-  
+
+  // Read input file param from command argument
   SddftObjInitialize(&sddft);
   
   // read files
@@ -47,7 +48,7 @@ int main( int argc, char **argv )
 	  }
   } 
 
-  ierr = PetscFinalize();CHKERRQ(ierr); 
+  ierr = PetscFinalize();CHKERRQ(ierr);
 
   return 0;
 }

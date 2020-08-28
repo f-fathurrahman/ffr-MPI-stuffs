@@ -1,29 +1,7 @@
-/*=============================================================================================
-  | Simulation Package for Ab-initio Real-space Calculations (SPARC) 
-  | Copyright (C) 2016 Material Physics & Mechanics Group at Georgia Tech.
-  |
-  | S. Ghosh, P. Suryanarayana, SPARC: Accurate and efficient finite-difference formulation and
-  | parallel implementation of Density Functional Theory. Part I: Isolated clusters, Computer
-  | Physics Communications
-  | S. Ghosh, P. Suryanarayana, SPARC: Accurate and efficient finite-difference formulation and
-  | parallel implementation of Density Functional Theory. Part II: Periodic systems, Computer
-  | Physics Communications  
-  |
-  | file name: spline.cc          
-  |
-  | Description: This file contains the functions required for spline interpolation
-  | Reference: Cubic Spline Interpolation: A Review, George Wolberg, Technical Report,
-  | Department of Computer Science, Columbia University
-  |
-  | Authors: Swarnava Ghosh, Phanish Suryanarayana
-  |
-  | Last Modified: 1/26/2016   
-  |-------------------------------------------------------------------------------------------*/
 #include "sddft.h"
 #include "petscsys.h"
-////////////////////////////////////////////////////////////////////////////////////////////////
+
 //                            ispline_gen: cubic spline interpolation                         //
-////////////////////////////////////////////////////////////////////////////////////////////////
 void ispline_gen(PetscScalar *X1,PetscScalar *Y1,int len1,PetscScalar *X2,PetscScalar *Y2,PetscScalar *DY2,int len2,PetscScalar *YD)
 {
   int i,j;

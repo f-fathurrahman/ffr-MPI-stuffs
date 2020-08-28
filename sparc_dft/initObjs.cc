@@ -55,7 +55,7 @@ PetscErrorCode Objects_Create(SDDFT_OBJ* pSddft)
 		    PETSC_DECIDE, PETSC_DECIDE, PETSC_DECIDE, 1, o, 0, 0, 0, &pSddft->da
       );
 	    DMDACreate3d(
-        PETSC_COMM_WORLD, DM_BOUNDARY_GHOSTED, DM_BOUNDARY_GHOSTED,D M_BOUNDARY_GHOSTED,
+        PETSC_COMM_WORLD, DM_BOUNDARY_GHOSTED, DM_BOUNDARY_GHOSTED, DM_BOUNDARY_GHOSTED,
         DMDA_STENCIL_STAR, n_x, n_y, n_z,
 		    PETSC_DECIDE, PETSC_DECIDE, PETSC_DECIDE, 1, o, 0, 0, 0, &pSddft->da_grad
       );
@@ -141,23 +141,21 @@ PetscErrorCode Objects_Create(SDDFT_OBJ* pSddft)
   KSPSetTolerances(pSddft->ksp,pSddft->KSPTOL,PETSC_DEFAULT,PETSC_DEFAULT,PETSC_DEFAULT);
   KSPSetFromOptions(pSddft->ksp);
 
-  /*
-   * Creating gradient operators
-   */
+  // Creating gradient operators
   if(comm_size == 1 ) 
-    {
-      DMCreateMatrix(pSddft->da_grad,&pSddft->gradient_x);
-      DMCreateMatrix(pSddft->da_grad,&pSddft->gradient_y);
-      DMCreateMatrix(pSddft->da_grad,&pSddft->gradient_z);
-      DMSetMatType(pSddft->da_grad,MATSEQBAIJ);
-    }
+  {
+    DMCreateMatrix(pSddft->da_grad,&pSddft->gradient_x);
+    DMCreateMatrix(pSddft->da_grad,&pSddft->gradient_y);
+    DMCreateMatrix(pSddft->da_grad,&pSddft->gradient_z);
+    DMSetMatType(pSddft->da_grad,MATSEQBAIJ);
+  }
   else 
-    {
-      DMCreateMatrix(pSddft->da_grad,&pSddft->gradient_x);
-      DMCreateMatrix(pSddft->da_grad,&pSddft->gradient_y);
-      DMCreateMatrix(pSddft->da_grad,&pSddft->gradient_z); 
-      DMSetMatType(pSddft->da_grad,MATMPIBAIJ);
-    }  
+  {
+    DMCreateMatrix(pSddft->da_grad,&pSddft->gradient_x);
+    DMCreateMatrix(pSddft->da_grad,&pSddft->gradient_y);
+    DMCreateMatrix(pSddft->da_grad,&pSddft->gradient_z); 
+    DMSetMatType(pSddft->da_grad,MATMPIBAIJ);
+  }  
   DMDAGetCorners(pSddft->da,&xcor,&ycor,&zcor,&lxdim,&lydim,&lzdim);
   PetscMalloc(sizeof(PetscInt)*(lzdim*lydim*lxdim),&pSddft->nnzDArray);
   PetscMalloc(sizeof(PetscInt)*(lzdim*lydim*lxdim),&pSddft->nnzODArray);
@@ -193,23 +191,28 @@ PetscErrorCode Laplace_matInit(SDDFT_OBJ* pSddft)
 	{
 	  row.k = k; row.j = j, row.i = i;   
 	  colidx=0; 
-	  col[colidx].i=i ;col[colidx].j=j ;col[colidx].k=k ;
-	  val[colidx++]=pSddft->coeffs[0]  ;
-	  for(l=1;l<=o;l++)
-	    {
-	      col[colidx].i=i ;col[colidx].j=j ;col[colidx].k=k-l ;
-	      val[colidx++]=pSddft->coeffs[l];
-	      col[colidx].i=i ;col[colidx].j=j ;col[colidx].k=k+l ;
-	      val[colidx++]=pSddft->coeffs[l];
-	      col[colidx].i=i ;col[colidx].j=j-l ;col[colidx].k=k ;
-	      val[colidx++]=pSddft->coeffs[l];
-	      col[colidx].i=i ;col[colidx].j=j+l ;col[colidx].k=k ;
-	      val[colidx++]=pSddft->coeffs[l];
-	      col[colidx].i=i-l ;col[colidx].j=j ;col[colidx].k=k ;
-	      val[colidx++]=pSddft->coeffs[l];
-	      col[colidx].i=i+l ;col[colidx].j=j ;col[colidx].k=k ;
-	      val[colidx++]=pSddft->coeffs[l];
-	    }    
+	  col[colidx].i=i; col[colidx].j=j; col[colidx].k=k;
+	  val[colidx++] = pSddft->coeffs[0]  ;
+	  for(l=1; l<=o; l++)
+	  {
+	    col[colidx].i=i; col[colidx].j=j; col[colidx].k=k-l;
+	    val[colidx++]=pSddft->coeffs[l];
+      //
+	    col[colidx].i=i; col[colidx].j=j; col[colidx].k=k+l;
+	    val[colidx++]=pSddft->coeffs[l];
+	    //
+      col[colidx].i=i;col[colidx].j=j-l; col[colidx].k=k;
+	    val[colidx++]=pSddft->coeffs[l];
+	    //
+      col[colidx].i=i; col[colidx].j=j+l; col[colidx].k=k;
+	    val[colidx++]=pSddft->coeffs[l];
+	    //
+      col[colidx].i=i-l; col[colidx].j=j; col[colidx].k=k;
+	    val[colidx++]=pSddft->coeffs[l];
+	    //
+      col[colidx].i=i+l; col[colidx].j=j; col[colidx].k=k;
+	    val[colidx++]=pSddft->coeffs[l];
+	  }    
 	  MatSetValuesStencil(A,1,&row,6*o+1,col,val,ADD_VALUES);
 	}
   MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY);
@@ -229,9 +232,10 @@ PetscErrorCode Laplace_matInit(SDDFT_OBJ* pSddft)
  
   return 0;  
 }
-///////////////////////////////////////////////////////////////////////////////////////////////
-//                         Gradient_matInit: Initializes the Gradient operators              //
-///////////////////////////////////////////////////////////////////////////////////////////////
+
+//
+// Gradient_matInit: Initializes the Gradient operators
+//
 PetscErrorCode Gradient_matInit(SDDFT_OBJ* pSddft)
 {
   

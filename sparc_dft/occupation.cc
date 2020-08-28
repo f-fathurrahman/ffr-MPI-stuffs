@@ -1,33 +1,15 @@
-/*=============================================================================================
-  | Simulation Package for Ab-initio Real-space Calculations (SPARC) 
-  | Copyright (C) 2016 Material Physics & Mechanics Group at Georgia Tech.
-  |
-  | S. Ghosh, P. Suryanarayana, SPARC: Accurate and efficient finite-difference formulation and
-  | parallel implementation of Density Functional Theory. Part I: Isolated clusters, Computer
-  | Physics Communications
-  | S. Ghosh, P. Suryanarayana, SPARC: Accurate and efficient finite-difference formulation and
-  | parallel implementation of Density Functional Theory. Part II: Periodic systems, Computer
-  | Physics Communications  
-  |
-  | file name: occupation.cc          
-  |
-  | Description: This file contains the Fermi-Dirac function, constraint on electronic 
-  | occupations, brent's root finding algorithm for calculation of fermi energy and function
-  | for subspace rotation
-  |
-  | Authors: Swarnava Ghosh, Phanish Suryanarayana
-  |
-  | Last Modified: 2/17/2016   
-  |-------------------------------------------------------------------------------------------*/
 #include "sddft.h"
 #include "petscsys.h"
 #include "math.h"
 #include "mkl_lapacke.h"
 #include "mkl.h"
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
+
 #define SIGN(a,b) ((b) >= 0.0 ? PetscAbsScalar(a) : -PetscAbsScalar(a))
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //                          constraint: constraint on occupation                             //
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,6 +28,7 @@ PetscScalar constraint(SDDFT_OBJ* pSddft,PetscScalar lambdaf)
   ans = g-Ne;		
   return ans;
 }
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //                    kPointconstraint: constraint on occupation                             //
 ///////////////////////////////////////////////////////////////////////////////////////////////

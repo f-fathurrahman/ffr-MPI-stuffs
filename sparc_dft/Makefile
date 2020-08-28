@@ -3,12 +3,12 @@ all:sparc
 CXX = mpicxx.openmpi
 
 PETSC_DIR1 = /home/efefer/WORKS/PETSC/petsc-3.5.3
-PETSC_DIR2 = /home/efefer/WORKS/PETSC/petsc-3.5.3/arch-linux2-c-debug
-#PETSC_DIR2 = /home/efefer/WORKS/PETSC/petsc-3.5.3/arch-linux2-c-opt
+#PETSC_DIR2 = /home/efefer/WORKS/PETSC/petsc-3.5.3/arch-linux2-c-debug
+PETSC_DIR2 = /home/efefer/WORKS/PETSC/petsc-3.5.3/arch-linux2-c-opt
 
 MKLROOT = /home/efefer/mysoftwares/LIBMKL/
 
-CPPFLAGS = -I ${PETSC_DIR1}/include -I ${PETSC_DIR2}/include -I ./inc -I ${MKLROOT}/include
+CPPFLAGS = -O3 -I ${PETSC_DIR1}/include -I ${PETSC_DIR2}/include -I ./inc -I ${MKLROOT}/include
 
 OBJSC = main.o initObjs.o spline.o nonlocal.o density.o \
 readfiles.o energy.o ExchangeCorrelation.o occupation.o poisson.o \

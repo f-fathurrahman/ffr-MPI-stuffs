@@ -30,7 +30,9 @@ typedef struct
   PetscInt size; ///< size of the arrays storing the pseudopotentials   
 } PSD_OBJ;
 
-// structure storing the variables required by the functions of SPARC 
+//
+// structure storing the variables required by the functions of SPARC
+//
 typedef struct
 {
   PetscInt numPoints_x; ///< stores the number of nodes in x-direction

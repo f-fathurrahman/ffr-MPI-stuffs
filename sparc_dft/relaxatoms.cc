@@ -1,36 +1,15 @@
-/*=============================================================================================
-  | Simulation Package for Ab-initio Real-space Calculations (SPARC) 
-  | Copyright (C) 2016 Material Physics & Mechanics Group at Georgia Tech.
-  |
-  | S. Ghosh, P. Suryanarayana, SPARC: Accurate and efficient finite-difference formulation and
-  | parallel implementation of Density Functional Theory. Part I: Isolated clusters, Computer
-  | Physics Communications
-  | S. Ghosh, P. Suryanarayana, SPARC: Accurate and efficient finite-difference formulation and
-  | parallel implementation of Density Functional Theory. Part II: Periodic systems, Computer
-  | Physics Communications  
-  |
-  | file name: relaxatoms.cc          
-  |
-  | Description: This file contains the functions required for atomic relaxation
-  |
-  | Authors: Swarnava Ghosh, Phanish Suryanarayana, Deepa Phanish
-  |
-  | Last Modified: 2/29/2016   
-  |-------------------------------------------------------------------------------------------*/
 #include "sddft.h"
 #include "isddft.h"
-///////////////////////////////////////////////////////////////////////////////////////////////
-//           FormFunction_relaxAtoms: performs one electronic structure minimization for     //
-//                                      fixed atomic positions                               //
-///////////////////////////////////////////////////////////////////////////////////////////////
+
+// FormFunction_relaxAtoms: performs one electronic structure minimization for
+// fixed atomic positions
 PetscErrorCode FormFunction_relaxAtoms(SDDFT_OBJ* pSddft)
 {
  
-  PetscPrintf(PETSC_COMM_WORLD," ***  Start of DFT calculation for fixed atomic positions (NONPERIODIC)***\n");
+  PetscPrintf(PETSC_COMM_WORLD, 
+    " ***  Start of DFT calculation for fixed atomic positions (NONPERIODIC)***\n");
  
-  /*
-   * calculate pseudocharge density
-   */
+  // calculate pseudocharge density
   ChargDensB_VecInit(pSddft);
   
   /*
@@ -446,9 +425,9 @@ void Display_Relax(SDDFT_OBJ* pSddft)
   VecRestoreArray(pSddft->mvAtmConstraint,&pmvAtmConstraint);
   return;
 }
-///////////////////////////////////////////////////////////////////////////////////////////////
-//     SDDFT_Nonperiodic: function for nonperiodic Density Functional theory calculation     //
-///////////////////////////////////////////////////////////////////////////////////////////////
+
+
+// SDDFT_Nonperiodic: function for nonperiodic Density Functional theory calculation
 PetscErrorCode SDDFT_Nonperiodic(SDDFT_OBJ* pSddft)
 {
 
@@ -457,77 +436,54 @@ PetscErrorCode SDDFT_Nonperiodic(SDDFT_OBJ* pSddft)
   int rank;
   MPI_Comm_rank(PETSC_COMM_WORLD,&rank);
   
-  /*
-   * create the data structures required for DFT calculation
-   */
+  // create the data structures required for DFT calculation
   ierr = Objects_Create(pSddft); CHKERRQ(ierr);     
   Laplace_matInit(pSddft); 
   Gradient_matInit(pSddft);
 
-  /*
-   * calculate initial guess electron density
-   */
+  // calculate initial guess electron density
   SuperpositionAtomicCharge_VecInit(pSddft);
   VecCopy(pSddft->SuperposAtRho,pSddft->elecDensRho); 
 
-  /*
-   * create nonlocal pseudopotential operator
-   */
+  // create nonlocal pseudopotential operator
   EstimateNonZerosNonlocalPseudopot(pSddft);   
   LaplacianNonlocalPseudopotential_MatInit(pSddft);
   Wavefunctions_MatInit(pSddft);
    
   if(pSddft->RelaxFlag==1)
-    {
-      /*
-       * perform atomic relaxation
-       */
-      NLCG_relaxAtoms(pSddft);
-    }
+  {
+    // perform atomic relaxation
+    NLCG_relaxAtoms(pSddft);
+  }
   else    
-    { 
-      /*
-       * DFT calculation with fixed atomic positions
-       */      
-      Display_Atompos(pSddft);
-      Display_Relax(pSddft);
+  { 
+    // DFT calculation with fixed atomic positions
+    Display_Atompos(pSddft);
+    Display_Relax(pSddft);
       
-      /*
-       * calculate pseudocharge density
-       */
-      ChargDensB_VecInit(pSddft);   
+    // calculate pseudocharge density
+    ChargDensB_VecInit(pSddft);   
      
-      /*
-       * calculate energy correction
-       */
-      ChargDensB_TM_VecInit(pSddft);
-      CorrectionEnergy_Calc(pSddft);  
+    // calculate energy correction
+    ChargDensB_TM_VecInit(pSddft);
+    CorrectionEnergy_Calc(pSddft);  
 
-      /*
-       * calculate electron density using Self Consistent Field iteration
-       */
-      SelfConsistentField(pSddft);        
+    // calculate electron density using Self Consistent Field iteration
+    SelfConsistentField(pSddft);        
 
-      /*
-       * calculate force correction
-       */
-      Calculate_forceCorrection(pSddft); 
-      /*
-       * calculate local component of forces
-       */
-      Calculate_force(pSddft); 
-      /*
-       * calculate nonlocal component of forces
-       */
+    // calculate force correction
+    Calculate_forceCorrection(pSddft); 
+      
+    // calculate local component of forces
+    Calculate_force(pSddft); 
+      
+      // calculate nonlocal component of forces
       Force_Nonlocal(pSddft,&pSddft->XOrb);
-      /*
-       * symmetrysize forces 
-       */
+      
+      // symmetrysize forces 
       Symmetrysize_force(pSddft);      
 
-      /*
-       * display forces on atoms and atomic poistions
-       */
+      // display forces on atoms and atomic poistions
       Display_force(pSddft);      
       Set_VecZero(pSddft);     
       MatDestroy(&pSddft->HamiltonianOpr);     
@@ -536,9 +492,8 @@ PetscErrorCode SDDFT_Nonperiodic(SDDFT_OBJ* pSddft)
   return 0;
    
 } 
-///////////////////////////////////////////////////////////////////////////////////////////////
-//     SDDFT_Periodic: function for nonperiodic Density Functional theory calculation        //
-///////////////////////////////////////////////////////////////////////////////////////////////
+
+// SDDFT_Periodic: function for nonperiodic Density Functional theory calculation        //
 PetscErrorCode SDDFT_Periodic(SDDFT_OBJ* pSddft)
 {
 
@@ -620,6 +575,8 @@ PetscErrorCode SDDFT_Periodic(SDDFT_OBJ* pSddft)
      
   return 0;   
 } 
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //     SDDFT_kPointPeriodic: function for nonperiodic Density Functional theory calculation  //
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -708,9 +665,10 @@ PetscErrorCode SDDFT_kPointPeriodic(SDDFT_OBJ* pSddft)
       
   return 0;   
 } 
-///////////////////////////////////////////////////////////////////////////////////////////////
-//     Periodic_MapAtoms: Mapping outside atoms back into the domain using periodic mapping  //
-///////////////////////////////////////////////////////////////////////////////////////////////
+
+//
+// Periodic_MapAtoms: Mapping outside atoms back into the domain using periodic mapping
+//
 void Periodic_MapAtoms(SDDFT_OBJ* pSddft)
 {
 

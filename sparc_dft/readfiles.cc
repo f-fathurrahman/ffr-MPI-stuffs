@@ -1,32 +1,15 @@
-/*=============================================================================================
-  | Simulation Package for Ab-initio Real-space Calculations (SPARC) 
-  | Copyright (C) 2016 Material Physics & Mechanics Group at Georgia Tech.
-  |
-  | S. Ghosh, P. Suryanarayana, SPARC: Accurate and efficient finite-difference formulation and
-  | parallel implementation of Density Functional Theory. Part I: Isolated clusters, Computer
-  | Physics Communications
-  | S. Ghosh, P. Suryanarayana, SPARC: Accurate and efficient finite-difference formulation and
-  | parallel implementation of Density Functional Theory. Part II: Periodic systems, Computer
-  | Physics Communications  
-  |
-  | file name: readfiles.cc          
-  |
-  | Description: This file contains the functions required for reading the input files
-  |
-  | Authors: Swarnava Ghosh, Phanish Suryanarayana
-  |
-  | Last Modified: 2/18/2016   
-  |-------------------------------------------------------------------------------------------*/
 #include "sddft.h"
 #include "petscsys.h"
 #include <iostream>
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
+
 using namespace std;
-///////////////////////////////////////////////////////////////////////////////////////////////
-//                              Read_parameters: reads the .inpt file                        //
-///////////////////////////////////////////////////////////////////////////////////////////////
+
+
+// Read_parameters: reads the .inpt file
 void Read_parameters(SDDFT_OBJ* pSddft)
 {
     
@@ -226,54 +209,65 @@ void Read_parameters(SDDFT_OBJ* pSddft)
     }while(!feof(fConfFile));
 	  
   fclose(fConfFile);
-   
-  /*
-   * now that the .inpt file is read, we calculate the mesh spacing
-   */
-  if(pSddft->BC==1) // non-periodic boundary condition
-    { 
-      delta_x = 2*pSddft->range_x/(pSddft->numPoints_x-1);
-      delta_y = 2*pSddft->range_y/(pSddft->numPoints_y-1);
-      delta_z = 2*pSddft->range_z/(pSddft->numPoints_z-1);
-    }else if (pSddft->BC==2) // periodic boundary condition
-    { 
-      delta_x = 2*pSddft->range_x/(pSddft->numPoints_x);
-      delta_y = 2*pSddft->range_y/(pSddft->numPoints_y);
-      delta_z = 2*pSddft->range_z/(pSddft->numPoints_z);
+  
 
-      if(pSddft->Nkpts > 1) // allocate memory for storing eigenvalues of all kpoints
-	{
-	  PetscMalloc(sizeof(PetscScalar*)*(pSddft->Nkpts_sym),&pSddft->kptWts);
-	  PetscMalloc(sizeof(PetscScalar*)*(pSddft->Nkpts_sym),&pSddft->lambdakpt);
-	  for(i=0;i<pSddft->Nkpts_sym;i++)
-	    PetscMalloc(sizeof(PetscScalar)*(pSddft->Nstates),&pSddft->lambdakpt[i]);
-	  /*
-	   * calculate and store the k point weights
-	   */
-	  kpointWeight_Init(pSddft);
-	}
-    }
- 
- 
-  /*
-   * check if delta_x=delta_y=delta_z within some tolerance 
-   */ 
-  if((fabs(delta_x-delta_y) >=1e-10) || (fabs(delta_x-delta_z) >=1e-10) || (fabs(delta_y-delta_z) >=1e-10))
-    {       PetscPrintf(PETSC_COMM_WORLD,"EXITING: mesh spacing MUST be same in all directions \n");
-      exit(0);
-    }else{ 
+  // FINISHED READING .inpt file
+
+
+
+  // now that the .inpt file is read, we calculate the mesh spacing
+  if( pSddft->BC==1 ) // non-periodic boundary condition
+  { 
+    delta_x = 2*pSddft->range_x/(pSddft->numPoints_x-1);
+    delta_y = 2*pSddft->range_y/(pSddft->numPoints_y-1);
+    delta_z = 2*pSddft->range_z/(pSddft->numPoints_z-1);
+  }
+  else if(pSddft->BC==2) // periodic boundary condition
+  { 
+    delta_x = 2*pSddft->range_x/(pSddft->numPoints_x);
+    delta_y = 2*pSddft->range_y/(pSddft->numPoints_y);
+    delta_z = 2*pSddft->range_z/(pSddft->numPoints_z);
+    //
+    if( pSddft->Nkpts > 1 ) // allocate memory for storing eigenvalues of all kpoints
+	  {
+	    PetscMalloc(sizeof(PetscScalar*)*(pSddft->Nkpts_sym),&pSddft->kptWts);
+	    PetscMalloc(sizeof(PetscScalar*)*(pSddft->Nkpts_sym),&pSddft->lambdakpt);
+	    for(i=0;i<pSddft->Nkpts_sym;i++)
+      {
+	      PetscMalloc(sizeof(PetscScalar)*(pSddft->Nstates),&pSddft->lambdakpt[i]);
+      }
+	    // calculate and store the k point weights
+	    kpointWeight_Init(pSddft);
+	  }
+  }
+  
+  //
+  // check if delta_x=delta_y=delta_z within some tolerance 
+  // 
+  if( (fabs(delta_x-delta_y) >=1e-10) ||
+      (fabs(delta_x-delta_z) >=1e-10) ||
+      (fabs(delta_y-delta_z) >=1e-10) )
+  {
+    PetscPrintf(PETSC_COMM_WORLD,"EXITING: mesh spacing MUST be same in all directions \n");
+    exit(0);
+  }
+  else{ 
     pSddft->delta = delta_x;   
   } 
-  /*
-   * finite difference coefficients of -(1/2)*laplacian operator
-   */
+  
+  //
+  // finite difference coefficients of -(1/2)*laplacian operator
+  //
   pSddft->coeffs[0] = 0;
-  for(a=1; a<=pSddft->order; a++)
-    pSddft->coeffs[0]+= ((PetscScalar)1.0/(a*a));
-  pSddft->coeffs[0]*=((PetscScalar)3.0/(pSddft->delta*pSddft->delta));
-	  
-  for(p=1;p<=pSddft->order;p++)
-    pSddft->coeffs[p] = (PetscScalar)(-1*pow(-1,p+1)*fract(pSddft->order,p)/(p*p*pSddft->delta*pSddft->delta));
+  for(a=1; a<=pSddft->order; a++) {
+    pSddft->coeffs[0] += ((PetscScalar)1.0/(a*a));
+  }
+  pSddft->coeffs[0] *= ((PetscScalar)3.0/(pSddft->delta*pSddft->delta));
+  //
+  for(p=1; p<=pSddft->order; p++) {
+    pSddft->coeffs[p] = (PetscScalar)(-1.0*pow(-1,p+1) * fract(pSddft->order,p)/ 
+                        (p*p*pSddft->delta*pSddft->delta));
+  }
 		 
   /*
    * finite difference coefficients for the gradient operator
@@ -282,39 +276,63 @@ void Read_parameters(SDDFT_OBJ* pSddft)
   for(p=1;p<=pSddft->order;p++)
     pSddft->coeffs_grad[p] = (PetscScalar)(pow(-1,p+1)*fract(pSddft->order,p)/(p*pSddft->delta));
  
-  PetscPrintf(PETSC_COMM_WORLD,"***************************************************************************\n");
-  PetscPrintf(PETSC_COMM_WORLD,"                           Initialization                                  \n");
-  PetscPrintf(PETSC_COMM_WORLD,"***************************************************************************\n");
-  PetscPrintf(PETSC_COMM_WORLD,"Domain lengths:                  { %f, %f, %f } (Bohr)\n",2*pSddft->range_x,2*pSddft->range_y,2*pSddft->range_z);
-  PetscPrintf(PETSC_COMM_WORLD,"Number of finite-difference nodes                    %d, %d, %d\n",pSddft->numPoints_x,pSddft->numPoints_y,pSddft->numPoints_z);
-  PetscPrintf(PETSC_COMM_WORLD,"Finite-difference order:                             %d\n",2*pSddft->order);
-  PetscPrintf(PETSC_COMM_WORLD,"Mesh spacing:                                        %f\n",pSddft->delta);   
-  PetscPrintf(PETSC_COMM_WORLD,"Boundary condition:                                  %d\n",pSddft->BC);
+  PetscPrintf(PETSC_COMM_WORLD,"==============\n");
+  PetscPrintf(PETSC_COMM_WORLD,"Initialization\n");
+  PetscPrintf(PETSC_COMM_WORLD,"==============\n");
+  
+  PetscPrintf(PETSC_COMM_WORLD,
+  "Domain lengths: { %f, %f, %f } (Bohr)\n",
+    2*pSddft->range_x, 2*pSddft->range_y, 2*pSddft->range_z);
+  
+  PetscPrintf(PETSC_COMM_WORLD,
+  "Number of finite-difference nodes %d, %d, %d\n",
+    pSddft->numPoints_x, pSddft->numPoints_y, pSddft->numPoints_z);
+  
+  PetscPrintf(PETSC_COMM_WORLD,"Finite-difference order: %d\n", 2*pSddft->order);
+  
+  PetscPrintf(PETSC_COMM_WORLD, "Mesh spacing: %f\n", pSddft->delta);   
+  
+  PetscPrintf(PETSC_COMM_WORLD, "Boundary condition: %d\n", pSddft->BC);
   if(pSddft->BC==2)
-    {
-PetscPrintf(PETSC_COMM_WORLD,"k-point grid (Monkhorst-Pack):                       %d x %d x %d\n",pSddft->Kx,pSddft->Ky,pSddft->Kz);
-  PetscPrintf(PETSC_COMM_WORLD,"Number of k-points used after symmetry reduction:    %d\n",pSddft->Nkpts_sym);
-    }
+  {
+    PetscPrintf(PETSC_COMM_WORLD,
+    "k-point grid (Monkhorst-Pack): %d x %d x %d\n", pSddft->Kx, pSddft->Ky, pSddft->Kz);
+    PetscPrintf(PETSC_COMM_WORLD,
+    "Number of k-points used after symmetry reduction: %d\n", pSddft->Nkpts_sym);
+  }
  
-  PetscPrintf(PETSC_COMM_WORLD,"Smearing:                                            %lf(1/Hartree)\n",pSddft->Beta);
-  PetscPrintf(PETSC_COMM_WORLD,"Degree of Chebyshev polynomial for Chebyshev filter: %d\n",pSddft->ChebDegree);
-  PetscPrintf(PETSC_COMM_WORLD,"Number of states of electronic occupation:           %d\n",pSddft->Nstates);
-  PetscPrintf(PETSC_COMM_WORLD,"Number of types of atomic species:                   %d\n",pSddft->Ntype);
-  PetscPrintf(PETSC_COMM_WORLD,"Exchange correlation functional:                     %s\n",pSddft->XC);
-  PetscPrintf(PETSC_COMM_WORLD,"Geometry optimization flag:                          %d\n",pSddft->RelaxFlag);
-  PetscPrintf(PETSC_COMM_WORLD,"Maximum number of SCF iterations:                    %d\n",pSddft->MAXITSCF);
-  PetscPrintf(PETSC_COMM_WORLD,"SCF Tolerence:                                       %e\n",pSddft->TOLSCF);
-  PetscPrintf(PETSC_COMM_WORLD,"Poisson Tolerence:                                   %e\n",pSddft->KSPTOL);
-  PetscPrintf(PETSC_COMM_WORLD,"Lanczos Tolerence:                                   %e\n",pSddft->LANCZOSTOL);
-  PetscPrintf(PETSC_COMM_WORLD,"Mixing parameter:                                    %f\n",pSddft->MixingParameter);
-  PetscPrintf(PETSC_COMM_WORLD,"Mixing history:                                      %d\n",pSddft->MixingHistory);	
+  PetscPrintf(PETSC_COMM_WORLD,
+  "Smearing parameter: %lf(1/Hartree)\n",pSddft->Beta);
+  
+  PetscPrintf(PETSC_COMM_WORLD,
+  "Degree of Chebyshev polynomial for Chebyshev filter: %d\n", pSddft->ChebDegree);
+  
+  PetscPrintf(PETSC_COMM_WORLD,
+  "Number of states of electronic occupation: %d\n", pSddft->Nstates);
+  
+  PetscPrintf(PETSC_COMM_WORLD,
+  "Number of types of atomic species: %d\n", pSddft->Ntype);
+  
+  PetscPrintf(PETSC_COMM_WORLD,
+  "Exchange correlation functional: %s\n",pSddft->XC);
+  
+  PetscPrintf(PETSC_COMM_WORLD,"Geometry optimization flag: %d\n",pSddft->RelaxFlag);
+  PetscPrintf(PETSC_COMM_WORLD,"Maximum number of SCF iterations: %d\n",pSddft->MAXITSCF);
+  PetscPrintf(PETSC_COMM_WORLD,"SCF Tolerence: %e\n",pSddft->TOLSCF);
+  PetscPrintf(PETSC_COMM_WORLD,"Poisson Tolerence: %e\n",pSddft->KSPTOL);
+  PetscPrintf(PETSC_COMM_WORLD,"Lanczos Tolerence: %e\n",pSddft->LANCZOSTOL);
+  PetscPrintf(PETSC_COMM_WORLD,"Mixing parameter: %f\n",pSddft->MixingParameter);
+  PetscPrintf(PETSC_COMM_WORLD,"Mixing history: %d\n",pSddft->MixingHistory);	
   for(i=0;i<pSddft->Ntype;i++)
-    {	 
-      PetscPrintf(PETSC_COMM_WORLD,"Pseudopotential file name for atom type %d is         %s\n",i+1,pSddft->psdName[i]);
-      PetscPrintf(PETSC_COMM_WORLD,"Choice of local pseudopotential for atom type %d is   %d\n",i+1,pSddft->localPsd[i]);   
-    }
+  {	 
+    PetscPrintf(PETSC_COMM_WORLD,
+    "Pseudopotential file name for atom type %d is %s\n", i+1, pSddft->psdName[i]);
+    PetscPrintf(PETSC_COMM_WORLD,
+    "Choice of local pseudopotential for atom type %d is %d\n", i+1, pSddft->localPsd[i]);   
+  }
   return;
 }
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //               fract: calculates (n!)^2/((n-k)!(n+k)!), used for calculating the           //
 //                    finite-difference weights of the gradient and lplacian                 //
@@ -332,6 +350,7 @@ PetscScalar fract(PetscInt n,PetscInt k)
   
   return (val);
 }
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //                     Read_ion: Reads the .ion file for ionic positions                     //
 ///////////////////////////////////////////////////////////////////////////////////////////////
