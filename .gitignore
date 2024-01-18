@@ -2,6 +2,7 @@ TEMP_*
 OLD_*
 ORIG_*
 
+.vscode
 *.swp
 *.swo
 *~
