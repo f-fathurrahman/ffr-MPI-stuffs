@@ -1,6 +1,7 @@
 TEMP_*
 OLD_*
 ORIG_*
+LOG*
 
 .vscode
 *.swp
