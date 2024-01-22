@@ -36,7 +36,9 @@ endif
 
 # for old Intel compiler, use -qopenmp instead of -fopenmp. ICC 17 and later also accepts -fopenmp. 
 #CFLAGS = -std=gnu99 -O3 -fopenmp
-CFLAGS = -std=gnu99 -O0 -fopenmp
+CFLAGS = -std=gnu99 -O3 -fopenmp
+
+MY_OBJS = my_Initialize.o
 
 OBJLIBS = initialization.o readfiles.o atomdata.o parallelization.o relax.o tools.o md.o      \
         electrostatics.o electronicGroundState.o electronDensity.o orbitalElecDensInit.o           \
@@ -58,7 +60,8 @@ OBJLIBS = initialization.o readfiles.o atomdata.o parallelization.o relax.o tool
         xc/exx/exactExchangePressure.o xc/exx/exactExchangeEnergyDensity.o \
         highT/sq.o highT/sqInitialization.o highT/sqFinalization.o highT/sqEnergy.o\
         highT/sqDensity.o highT/sqNlocVecRoutines.o highT/sqParallelization.o          \
-        highT/sqProperties.o highT/sqtool.o
+        highT/sqProperties.o highT/sqtool.o \
+        $(MY_OBJS)
 
 OBJSC = main.o $(OBJLIBS)
 
@@ -75,6 +78,9 @@ all: lib
 
 lib: $(OBJLIBS)
 	ar rcs libsparc.a $(OBJLIBS)
+
+main_debug: lib
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) -o main_debug.x main_debug.c libsparc.a $(LDLIBS)
 
 sparc: $(OBJSC)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $(EXECUTABLE) $^ $(LDLIBS)

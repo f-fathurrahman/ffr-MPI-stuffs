@@ -218,43 +218,33 @@ void atomdata_mass(char *element, double *mass) {
     *mass = 244;
   } else if (strcmpi(element, "Am") == 0) {
     //*mass = ;
-    printf("No atomic data for element %s, please provide in input file!\n",
-           element);
+    printf("No atomic data for element %s, please provide in input file!\n", element);
   } else if (strcmpi(element, "Cm") == 0) {
     //*mass = ;
-    printf("No atomic data for element %s, please provide in input file!\n",
-           element);
+    printf("No atomic data for element %s, please provide in input file!\n", element);
   } else if (strcmpi(element, "Bk") == 0) {
     //*mass = ;
-    printf("No atomic data for element %s, please provide in input file!\n",
-           element);
+    printf("No atomic data for element %s, please provide in input file!\n", element);
   } else if (strcmpi(element, "Cf") == 0) {
     //*mass = ;
-    printf("No atomic data for element %s, please provide in input file!\n",
-           element);
+    printf("No atomic data for element %s, please provide in input file!\n", element);
   } else if (strcmpi(element, "Es") == 0) {
     //*mass = ;
-    printf("No atomic data for element %s, please provide in input file!\n",
-           element);
+    printf("No atomic data for element %s, please provide in input file!\n", element);
   } else if (strcmpi(element, "Fm") == 0) {
     //*mass = ;
-    printf("No atomic data for element %s, please provide in input file!\n",
-           element);
+    printf("No atomic data for element %s, please provide in input file!\n", element);
   } else if (strcmpi(element, "Md") == 0) {
     //*mass = ;
-    printf("No atomic data for element %s, please provide in input file!\n",
-           element);
+    printf("No atomic data for element %s, please provide in input file!\n", element);
   } else if (strcmpi(element, "No") == 0) {
     //*mass = ;
-    printf("No atomic data for element %s, please provide in input file!\n",
-           element);
+    printf("No atomic data for element %s, please provide in input file!\n", element);
   } else if (strcmpi(element, "Lw") == 0 || strcmpi(element, "Lr") == 0) {
     //*mass = ;
-    printf("No atomic data for element %s, please provide in input file!\n",
-           element);
+    printf("No atomic data for element %s, please provide in input file!\n", element);
   } else {
-    printf("No atomic data for element %s, please provide in input file!\n",
-           element);
+    printf("No atomic data for element %s, please provide in input file!\n", element);
   }
 }
 
@@ -456,42 +446,32 @@ void atomdata_number(char *element, int *Z) {
     *Z = 94;
   } else if (strcmpi(element, "Am") == 0) {
     //*Z = ;
-    printf("No atomic data for element %s, please provide in input file!\n",
-           element);
+    printf("No atomic data for element %s, please provide in input file!\n", element);
   } else if (strcmpi(element, "Cm") == 0) {
     //*Z = ;
-    printf("No atomic data for element %s, please provide in input file!\n",
-           element);
+    printf("No atomic data for element %s, please provide in input file!\n", element);
   } else if (strcmpi(element, "Bk") == 0) {
     //*Z = ;
-    printf("No atomic data for element %s, please provide in input file!\n",
-           element);
+    printf("No atomic data for element %s, please provide in input file!\n", element);
   } else if (strcmpi(element, "Cf") == 0) {
     //*Z = ;
-    printf("No atomic data for element %s, please provide in input file!\n",
-           element);
+    printf("No atomic data for element %s, please provide in input file!\n", element);
   } else if (strcmpi(element, "Es") == 0) {
     //*Z = ;
-    printf("No atomic data for element %s, please provide in input file!\n",
-           element);
+    printf("No atomic data for element %s, please provide in input file!\n", element);
   } else if (strcmpi(element, "Fm") == 0) {
     //*Z = ;
-    printf("No atomic data for element %s, please provide in input file!\n",
-           element);
+    printf("No atomic data for element %s, please provide in input file!\n", element);
   } else if (strcmpi(element, "Md") == 0) {
     //*Z = ;
-    printf("No atomic data for element %s, please provide in input file!\n",
-           element);
+    printf("No atomic data for element %s, please provide in input file!\n", element);
   } else if (strcmpi(element, "No") == 0) {
     //*Z = ;
-    printf("No atomic data for element %s, please provide in input file!\n",
-           element);
+    printf("No atomic data for element %s, please provide in input file!\n", element);
   } else if (strcmpi(element, "Lw") == 0 || strcmpi(element, "Lr") == 0) {
     //*Z = ;
-    printf("No atomic data for element %s, please provide in input file!\n",
-           element);
+    printf("No atomic data for element %s, please provide in input file!\n", element);
   } else {
-    printf("No atomic data for element %s, please provide in input file!\n",
-           element);
+    printf("No atomic data for element %s, please provide in input file!\n", element);
   }
 }
