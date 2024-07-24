@@ -2892,7 +2892,7 @@ void Calculate_kpoints(SPARC_OBJ *pSPARC) {
         k3_red = fmod(k3_red + pSPARC->kptshift[2] / pSPARC->Kz + 0.5 - TEMP_TOL, 1.0) - 0.5 + TEMP_TOL;
 #ifdef DEBUG
         if (!rank)
-          printf(BLU "[k1_red,k2_red,k3_red] = %8.4f %8.4f %8.4f\n" RESET, k1_red, k2_red, k3_red);
+          printf("[k1_red,k2_red,k3_red] = %8.4f %8.4f %8.4f\n", k1_red, k2_red, k3_red);
 #endif
         k1 = k1_red * 2.0 * M_PI / Lx;
         k2 = k2_red * 2.0 * M_PI / Ly;

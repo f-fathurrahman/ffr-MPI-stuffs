@@ -1080,13 +1080,13 @@ void read_ion(SPARC_INPUT_OBJ *pSPARC_Input, SPARC_OBJ *pSPARC) {
             find_element(elemType, &pSPARC->atomType[L_ATMTYPE*ityp]);
 #ifdef DEBUG
             t2 = MPI_Wtime();
-            printf(GRN"\nTime for finding element is %.3f ms\n",(t2-t1)*1000);
-            printf(GRN"Element type for atom_type %s is %s\n"RESET, &pSPARC->atomType[L_ATMTYPE*ityp], elemType);
+            printf("\nTime for finding element is %.3f ms\n", (t2-t1)*1000);
+            printf("Element type for atom_type %s is %s\n", &pSPARC->atomType[L_ATMTYPE*ityp], elemType);
 #endif            
             // find default atomic mass
             atomdata_mass(elemType, &pSPARC->Mass[ityp]);
 #ifdef DEBUG
-            printf(GRN"Default atomic mass for %s is %f\n"RESET,elemType,pSPARC->Mass[ityp]);
+            printf("Default atomic mass for %s is %f\n",elemType,pSPARC->Mass[ityp]);
 #endif
         }
     }
