@@ -12,7 +12,7 @@ DEBUG_MODE    = 1
 
 ENABLE_SIMD_COMPLEX = 0
 
-CPPFLAGS = -Iinclude/ -Ixc/exx/include -Ixc/vdW/d3/include -Ixc/vdW/vdWDF/include -Ixc/mgga/include -IhighT/include
+CPPFLAGS = -I./ -Ixc/exx/include -Ixc/vdW/d3/include -Ixc/vdW/vdWDF/include -Ixc/mgga/include -IhighT/include
 LDLIBS   = -lrt
 LDLIBS += -llapacke -llapack -lblas -lm
 
@@ -87,7 +87,7 @@ sparc: $(OBJSC)
 
 .PHONY: clean
 clean:
-	rm -f  $(OBJSC) $(EXECUTABLE)
+	rm -f  $(OBJSC) $(EXECUTABLE) main_debug.x
 
 test: ../tests/SPARC_testing_script.py
 	cd ../tests; python SPARC_testing_script.py
