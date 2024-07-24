@@ -7,16 +7,20 @@ void my_Initialize(SPARC_OBJ *pSPARC, int argc, char *argv[]);
 
 int main(int argc, char* argv[])
 {
-    // set up MPI
+  // set up MPI
   MPI_Init(&argc, &argv);
+  
   // get communicator size and my rank
   MPI_Comm comm = MPI_COMM_WORLD;
   int nproc, rank;
   MPI_Comm_size(comm, &nproc);
   MPI_Comm_rank(comm, &rank);
 
+  // This is our central object
   SPARC_OBJ SPARC;
+  
   double t1, t2;
+  // why this is needed ?
   MPI_Barrier(MPI_COMM_WORLD);
   
   // start timer
