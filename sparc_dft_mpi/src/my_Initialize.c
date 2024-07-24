@@ -15,9 +15,16 @@
 
 void my_Initialize(SPARC_OBJ *pSPARC, int argc, char *argv[]) {
 
+
   double t1, t2;
   int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  if(rank == 0) {
+    printf("-------------------------------\n");
+    printf("---- ENTER my_Initialize ------\n");
+    printf("-------------------------------\n");
+  }
 
   MPI_Request req;
 
@@ -238,4 +245,12 @@ void my_Initialize(SPARC_OBJ *pSPARC, int argc, char *argv[]) {
   if (rank == 0) {
     write_output_init(pSPARC);
   }
+
+  if(rank == 0) {
+    printf("-------------------------------\n");
+    printf("---- EXIT my_Initialize -------\n");
+    printf("-------------------------------\n");
+  }
+
+  return;
 }
