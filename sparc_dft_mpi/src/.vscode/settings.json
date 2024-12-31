@@ -6,8 +6,9 @@
     "LOG_*": true,
     "*.lyx": true,
     "*.lyx~": true,
-    "*.o": true,
+    "**/*.o": true,
     "*.x": true,
+    "*.a": true,
   }
 }
 

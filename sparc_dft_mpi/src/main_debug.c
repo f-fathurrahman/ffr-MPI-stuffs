@@ -3,7 +3,14 @@
 
 #include "isddft.h"
 
+// ... declare debugging functions here ...
 void my_Initialize(SPARC_OBJ *pSPARC, int argc, char *argv[]);
+
+void investigate_sparc_obj(SPARC_OBJ *pSPARC) {
+  printf("Nx_d = %d\n", pSPARC->Nx_d);
+  return;
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -29,6 +36,9 @@ int main(int argc, char* argv[])
 
   // Read files and initialize
   my_Initialize(&SPARC, argc, argv);
+
+  investigate_sparc_obj(&SPARC);
+
 
   MPI_Barrier(MPI_COMM_WORLD);
   // end timer
