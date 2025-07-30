@@ -40,7 +40,30 @@ CFLAGS = -std=gnu99 -O3 -fopenmp
 
 MY_OBJS = my_Initialize.o
 
-OBJLIBS = initialization.o readfiles.o atomdata.o parallelization.o relax.o tools.o md.o      \
+OBJ_INITIALIZE = \
+Initialize.o \
+print_usage.o \
+SPARC_Input_MPI_create.o \
+check_inputs.o \
+set_defaults.o \
+bcast_SPARC_Atom.o \
+SPARC_copy_input.o \
+Calculate_SplineDerivRadFun.o \
+Cart2nonCart_transformMat.o \
+nonCart2Cart_coord.o \
+Cart2nonCart_coord.o \
+nonCart2Cart_grad.o \
+CalculateDistance.o \
+write_output_init.o \
+Calculate_kpoints.o \
+Calculate_local_kpoints.o \
+kpointWeight.o \
+estimate_memory.o \
+Ecut2h.o \
+compute_nearest_neighbor_dist.o \
+parallel_eigensolver_max_processor.o
+
+OBJLIBS = readfiles.o atomdata.o parallelization.o relax.o tools.o md.o      \
         electrostatics.o electronicGroundState.o electronDensity.o orbitalElecDensInit.o           \
         occupation.o gradVecRoutines.o gradVecRoutinesKpt.o nlocVecRoutines.o     \
         hamiltonianVecRoutines.o lapVecRoutines.o lapVecRoutinesKpt.o \
@@ -61,6 +84,7 @@ OBJLIBS = initialization.o readfiles.o atomdata.o parallelization.o relax.o tool
         highT/sq.o highT/sqInitialization.o highT/sqFinalization.o highT/sqEnergy.o\
         highT/sqDensity.o highT/sqNlocVecRoutines.o highT/sqParallelization.o          \
         highT/sqProperties.o highT/sqtool.o \
+        $(OBJ_INITIALIZE) \
         $(MY_OBJS)
 
 OBJSC = main.o $(OBJLIBS)

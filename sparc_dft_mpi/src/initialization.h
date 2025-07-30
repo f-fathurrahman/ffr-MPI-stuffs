@@ -27,6 +27,9 @@
  */
 void Initialize(SPARC_OBJ *pSPARC, int argc, char *argv[]);
 
+void my_Initialize(SPARC_OBJ *pSPARC, int argc, char *argv[]);
+
+
 
 /**
  * @brief   Prints usage of SPARC through command line.

@@ -1,76 +1,109 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 
-#include <mpi.h>
+// #include <string.h>
+// #include <math.h>
+// #include <mpi.h>
+// #include <time.h>
+// #include <assert.h>
+// // this is for checking existence of files
+// #include <unistd.h>
 
+#include "initialization.h"
+
+
+#include "readfiles.h"
+#include "nlocVecRoutines.h"
+#include "electrostatics.h"
+#include "tools.h"
+#include "eigenSolver.h"    // Mesh2ChebDegree, init_GTM_CheFSI()
+#include "eigenSolverKpt.h" // init_GTM_CheFSI_kpt()
+#include "parallelization.h"
 #include "isddft.h"
+#include "d3initialization.h"
+#include "vdWDFinitialization.h"
+#include "mGGAinitialization.h"
+#include "exactExchangeInitialization.h"
+#include "spinOrbitCoupling.h"
+#include "sqInitialization.h"
+#include "sqParallelization.h"
+
+#define TEMP_TOL 1e-12
 
 #define min(x, y) ((x) < (y) ? (x) : (y))
 #define max(x, y) ((x) > (y) ? (x) : (y))
 
+#define N_MEMBR 162
 
-// ffr: DEBUG flag will be enabled to remove clutters
-
-
-void my_Initialize(SPARC_OBJ *pSPARC, int argc, char *argv[]) {
-
-
+/**
+ * @brief   Performs necessary initialization.
+ */
+void Initialize(SPARC_OBJ *pSPARC, int argc, char *argv[]) {
+#ifdef DEBUG
   double t1, t2;
+#endif
   int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-  if(rank == 0) {
-    printf("-------------------------------\n");
-    printf("---- ENTER my_Initialize ------\n");
-    printf("-------------------------------\n");
-  }
 
   MPI_Request req;
 
   // these two structs are for reading info. and broadcasting
   SPARC_INPUT_OBJ SPARC_Input;
 
-
+#ifdef DEBUG
   t1 = MPI_Wtime();
+#endif
 
   /* Create new MPI struct datatype SPARC_INPUT_MPI (for broadcasting) */
   MPI_Datatype SPARC_INPUT_MPI;
   SPARC_Input_MPI_create(&SPARC_INPUT_MPI);
 
+#ifdef DEBUG
   t2 = MPI_Wtime();
   if (rank == 0)
     printf("\nCreating SPARC_INPUT_MPI datatype took %.3f ms\n", (t2 - t1) * 1000);
+#endif
 
   if (rank == 0) {
-
+#ifdef DEBUG
     printf("Initializing ...\n");
     t1 = MPI_Wtime();
+#endif
     // check input arguments and read filename
     check_inputs(&SPARC_Input, argc, argv);
 
+#ifdef DEBUG
     t2 = MPI_Wtime();
     printf("\nChecking inputs parsed by commandline took %.3f ms\n", (t2 - t1) * 1000);
     t1 = MPI_Wtime();
+#endif
     set_defaults(&SPARC_Input, pSPARC); // set default values
 
+#ifdef DEBUG
     t2 = MPI_Wtime();
     printf("\nSet default values took %.3f ms\n", (t2 - t1) * 1000);
     t1 = MPI_Wtime();
+#endif
     read_input(&SPARC_Input, pSPARC); // read input file
 
+#ifdef DEBUG
     t2 = MPI_Wtime();
     printf("\nReading input file took %.3f ms\n", (t2 - t1) * 1000);
+#endif
 
     // broadcast the parameters read from the input files
     MPI_Bcast(&SPARC_Input, 1, SPARC_INPUT_MPI, 0, MPI_COMM_WORLD);
 
+#ifdef DEBUG
     t1 = MPI_Wtime();
+#endif
     read_ion(&SPARC_Input, pSPARC); // read ion file
 
+#ifdef DEBUG
     t2 = MPI_Wtime();
     printf("\nReading ion file took %.3f ms\n", (t2 - t1) * 1000);
     t1 = MPI_Wtime();
+#endif
 
     // broadcast Ntypes read from ion file
     MPI_Ibcast(&pSPARC->Ntypes, 1, MPI_INT, 0, MPI_COMM_WORLD, &req);
@@ -85,30 +118,40 @@ void my_Initialize(SPARC_OBJ *pSPARC, int argc, char *argv[]) {
 
     // read_pseudopotential_TM(&SPARC_Input, pSPARC); // read TM format
     // pseudopotential file
-    read_pseudopotential_PSP(&SPARC_Input, pSPARC); 
-    // read psp format pseudopotential file (ABINIT's psp8 format ?)
+    read_pseudopotential_PSP(&SPARC_Input,
+                             pSPARC); // read psp format pseudopotential file
 
+#ifdef DEBUG
     t2 = MPI_Wtime();
     printf("\nReading pseudopotential file took %.3f ms\n", (t2 - t1) * 1000);
+#endif
 
   } else {
 
+#ifdef DEBUG
     t1 = MPI_Wtime();
+#endif
     MPI_Bcast(&SPARC_Input, 1, SPARC_INPUT_MPI, 0, MPI_COMM_WORLD);
+#ifdef DEBUG
     t2 = MPI_Wtime();
     if (rank == 0)
       printf("Broadcasting the input parameters took %.3f ms\n", (t2 - t1) * 1000);
+#endif
     // broadcast Ntypes read from ion file
     MPI_Ibcast(&pSPARC->Ntypes, 1, MPI_INT, 0, MPI_COMM_WORLD, &req);
   }
+#ifdef DEBUG
   t1 = MPI_Wtime();
+#endif
 
   MPI_Type_free(&SPARC_INPUT_MPI); // free the new MPI datatype
 
+#ifdef DEBUG
   t2 = MPI_Wtime();
   if (rank == 0)
     printf("\nFreeing SPARC_INPUT_MPI datatype took %.3f ms\n", (t2 - t1) * 1000);
   t1 = MPI_Wtime();
+#endif
 
   // Ntypes is no longer read from .inpt file
   // pSPARC->Ntypes = SPARC_Input.Ntypes;
@@ -118,6 +161,7 @@ void my_Initialize(SPARC_OBJ *pSPARC, int argc, char *argv[]) {
   // broadcast SPARC members regarding Atom info. using MPI_Pack & MPI_Unpack
   bcast_SPARC_Atom(pSPARC);
 
+#ifdef DEBUG
   t2 = MPI_Wtime();
   if (rank == 0)
     printf("Broadcasting Atom info. using MPI_Pack & MPI_Unpack in SPARC took "
@@ -125,36 +169,59 @@ void my_Initialize(SPARC_OBJ *pSPARC, int argc, char *argv[]) {
            (t2 - t1) * 1000);
 
   t1 = MPI_Wtime();
+#endif
 
   // copy the data read from input files into struct SPARC
   SPARC_copy_input(pSPARC, &SPARC_Input);
 
+#ifdef DEBUG
   t2 = MPI_Wtime();
   if (rank == 0)
     printf("\nrank = %d, Copying data from SPARC_Input into SPARC & set up "
            "subcomm took %.3f ms\n",
            rank, (t2 - t1) * 1000);
+#endif
 
   // set up sub-communicators
   if (pSPARC->SQFlag == 1) {
-    //
     Setup_Comms_SQ(pSPARC);
-    //
   } else {
     Setup_Comms(pSPARC);
-    //
+
+#ifdef USE_DP_SUBEIG
+#if !defined(USE_MKL) && !defined(USE_SCALAPACK)
     if (pSPARC->useLAPACK == 0) {
+#ifdef DEBUG
       if (rank == 0)
         printf("[WARNING] ScaLAPACK is not compiled and Nstates > MAX_NS, "
                "subspace eigen-problem will be solved in sequential.\n");
+#endif
       pSPARC->useLAPACK = 1;
     }
+#endif
+
+// SPARCX_ACCEL_NOTE Need to add this. Make sure it is always within "#ifdef
+// USE_DP_SUBEIG" branch
+// --- BEGIN. Alfredo Metere
+#ifdef ACCEL // Activating flag for using hardware acceleration at compile time.
+    pSPARC->useACCEL = 1;
+    //	#else
+    //	pSPARC->useACCEL = 0;
+
+    if (rank == 0) {
+      char *hwaccel[2] = {"DISABLED", "ENABLED"};
+      printf("[INFO] Hardware acceleration is %s\n", hwaccel[pSPARC->useACCEL]);
+    }
+#endif // ACCEL
+    // --- END. Alfredo Metere
+
     pSPARC->DP_CheFSI = NULL;
     pSPARC->DP_CheFSI_kpt = NULL;
     if (pSPARC->isGammaPoint)
       init_DP_CheFSI(pSPARC);
     else
       init_DP_CheFSI_kpt(pSPARC);
+#endif
 
     // calculate maximum number of processors for eigenvalue solver
     if (pSPARC->useLAPACK == 0) {
@@ -173,11 +240,13 @@ void my_Initialize(SPARC_OBJ *pSPARC, int argc, char *argv[]) {
       if (ierr)
         pSPARC->eig_paral_subdims[0] = pSPARC->eig_paral_subdims[1] = 1;
 
+#ifdef DEBUG
       if (rank == 0)
         printf("\nMaximun number of processors for eigenvalue solver is %d\n", pSPARC->eig_paral_maxnp);
       if (rank == 0)
-        printf("The dimension of subgrid for eigen solver is (%d x %d).\n", pSPARC->eig_paral_subdims[0],
+        printf("The dimension of subgrid for eigen sovler is (%d x %d).\n", pSPARC->eig_paral_subdims[0],
                pSPARC->eig_paral_subdims[1]);
+#endif
     }
   }
 
@@ -186,15 +255,17 @@ void my_Initialize(SPARC_OBJ *pSPARC, int argc, char *argv[]) {
     init_exx(pSPARC);
   }
 
+#ifdef DEBUG
   t1 = MPI_Wtime();
+#endif
 
   // calculate spline derivatives for interpolation
   Calculate_SplineDerivRadFun(pSPARC);
-
+#ifdef DEBUG
   t2 = MPI_Wtime();
   if (rank == 0)
     printf("\nCalculate_SplineDerivRadFun took %.3f ms\n", (t2 - t1) * 1000);
-
+#endif
 
   if (pSPARC->SQFlag == 1) {
     init_SQ(pSPARC);
@@ -205,12 +276,16 @@ void my_Initialize(SPARC_OBJ *pSPARC, int argc, char *argv[]) {
       CalculateNonlocalInnerProductIndexSOC(pSPARC);
   }
 
+#ifdef DEBUG
   t1 = MPI_Wtime();
+#endif
   // calculate pseudocharge density cutoff ("rb")
   Calculate_PseudochargeCutoff(pSPARC);
+#ifdef DEBUG
   t2 = MPI_Wtime();
   if (rank == 0)
     printf("\nCalculating rb for all atom types took %.3f ms\n", (t2 - t1) * 1000);
+#endif
 
   // initialize DFT-D3
   if (pSPARC->d3Flag == 1) {
@@ -245,12 +320,4 @@ void my_Initialize(SPARC_OBJ *pSPARC, int argc, char *argv[]) {
   if (rank == 0) {
     write_output_init(pSPARC);
   }
-
-  if(rank == 0) {
-    printf("-------------------------------\n");
-    printf("---- EXIT my_Initialize -------\n");
-    printf("-------------------------------\n");
-  }
-
-  return;
 }
