@@ -177,8 +177,9 @@ double compute_nearest_neighbor_dist(SPARC_OBJ *pSPARC, char CorN);
  *          processors for eigenvalue solver. 
  */
 int parallel_eigensolver_max_processor(int N, char RorC, char SorG);
+
+
+
 #endif // INITIALIZATION_H 
-
-
 
 

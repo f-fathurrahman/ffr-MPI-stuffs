@@ -101,6 +101,7 @@ all: lib
 # 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 lib: $(OBJLIBS)
+	rm -fv libsparc.a
 	ar rcs libsparc.a $(OBJLIBS)
 
 main_debug: lib
