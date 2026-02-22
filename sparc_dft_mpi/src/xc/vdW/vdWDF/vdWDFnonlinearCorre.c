@@ -1001,9 +1001,9 @@ void vdWDF_potential(SPARC_OBJ *pSPARC)
             Dh_1 = (double *)malloc(sizeof(double) * DMnd);
             Dh_2 = (double *)malloc(sizeof(double) * DMnd);
             Dh_3 = (double *)malloc(sizeof(double) * DMnd);
-            Gradient_vectors_dir(pSPARC, DMnd, pSPARC->DMVertices, 1, 0.0, h, Dh_1, 0, pSPARC->dmcomm_phi); // nonCart direction
-            Gradient_vectors_dir(pSPARC, DMnd, pSPARC->DMVertices, 1, 0.0, h, Dh_2, 1, pSPARC->dmcomm_phi);
-            Gradient_vectors_dir(pSPARC, DMnd, pSPARC->DMVertices, 1, 0.0, h, Dh_3, 2, pSPARC->dmcomm_phi);
+            Gradient_vectors_dir(pSPARC, DMnd, pSPARC->DMVertices, 1, 0.0, h, DMnd, Dh_1, DMnd, 0, pSPARC->dmcomm_phi); // nonCart direction
+            Gradient_vectors_dir(pSPARC, DMnd, pSPARC->DMVertices, 1, 0.0, h, DMnd, Dh_2, DMnd, 1, pSPARC->dmcomm_phi);
+            Gradient_vectors_dir(pSPARC, DMnd, pSPARC->DMVertices, 1, 0.0, h, DMnd, Dh_3, DMnd, 2, pSPARC->dmcomm_phi);
             for (igrid = 0; igrid < DMnd; igrid++)
             {
                 Dh[igrid] = pSPARC->gradT[0 + direction] * Dh_1[igrid] + pSPARC->gradT[3 + direction] * Dh_2[igrid] + pSPARC->gradT[6 + direction] * Dh_3[igrid];
@@ -1014,7 +1014,7 @@ void vdWDF_potential(SPARC_OBJ *pSPARC)
         }
         else
         {                                                                                                         // orthogonal cell
-            Gradient_vectors_dir(pSPARC, DMnd, pSPARC->DMVertices, 1, 0.0, h, Dh, direction, pSPARC->dmcomm_phi); // Soler's paper (10), diffential coefficient matrix
+            Gradient_vectors_dir(pSPARC, DMnd, pSPARC->DMVertices, 1, 0.0, h, DMnd, Dh, DMnd, direction, pSPARC->dmcomm_phi); // Soler's paper (10), diffential coefficient matrix
         }
         for (igrid = 0; igrid < DMnd; igrid++)
         {
@@ -1079,9 +1079,9 @@ void spin_vdWDF_potential(SPARC_OBJ *pSPARC)
         }
         if (pSPARC->cell_typ > 10 && pSPARC->cell_typ < 20)
         {                                                                                                   // non-orthogonal cell
-            Gradient_vectors_dir(pSPARC, DMnd, pSPARC->DMVertices, 2, 0.0, h, Dh_1, 0, pSPARC->dmcomm_phi); // nonCart direction
-            Gradient_vectors_dir(pSPARC, DMnd, pSPARC->DMVertices, 2, 0.0, h, Dh_2, 1, pSPARC->dmcomm_phi);
-            Gradient_vectors_dir(pSPARC, DMnd, pSPARC->DMVertices, 2, 0.0, h, Dh_3, 2, pSPARC->dmcomm_phi);
+            Gradient_vectors_dir(pSPARC, DMnd, pSPARC->DMVertices, 2, 0.0, h, DMnd, Dh_1, DMnd, 0, pSPARC->dmcomm_phi); // nonCart direction
+            Gradient_vectors_dir(pSPARC, DMnd, pSPARC->DMVertices, 2, 0.0, h, DMnd, Dh_2, DMnd, 1, pSPARC->dmcomm_phi);
+            Gradient_vectors_dir(pSPARC, DMnd, pSPARC->DMVertices, 2, 0.0, h, DMnd, Dh_3, DMnd, 2, pSPARC->dmcomm_phi);
             for (i = 0; i < 2 * DMnd; i++)
             {
                 Dh[i] = pSPARC->gradT[0 + direction] * Dh_1[i] + pSPARC->gradT[3 + direction] * Dh_2[i] + pSPARC->gradT[6 + direction] * Dh_3[i];
@@ -1089,7 +1089,7 @@ void spin_vdWDF_potential(SPARC_OBJ *pSPARC)
         }
         else
         {                                                                                                         // orthogonal cell
-            Gradient_vectors_dir(pSPARC, DMnd, pSPARC->DMVertices, 2, 0.0, h, Dh, direction, pSPARC->dmcomm_phi); // Soler's paper (10), diffential coefficient matrix
+            Gradient_vectors_dir(pSPARC, DMnd, pSPARC->DMVertices, 2, 0.0, h, DMnd, Dh, DMnd, direction, pSPARC->dmcomm_phi); // Soler's paper (10), diffential coefficient matrix
         }
         for (i = 0; i < 2 * DMnd; i++)
         {
@@ -1154,4 +1154,38 @@ void Calculate_nonLinearCorr_E_V_SvdWDF(SPARC_OBJ *pSPARC, double *rho)
 void Add_Exc_vdWDF(SPARC_OBJ *pSPARC)
 { // add vdW_DF energy into the total xc energy
     pSPARC->Exc += pSPARC->vdWDFenergy;
+}
+
+void find_folder_route(SPARC_OBJ *pSPARC, char *folderRoute) { // used for returning the folder route of the input files
+    strncpy(folderRoute, pSPARC->filename, L_STRING);
+    int indexEndFolderRoute = 0;
+    while (folderRoute[indexEndFolderRoute] != '\0') {
+        indexEndFolderRoute++;
+    } // get the length of the char filename
+    while ((indexEndFolderRoute > -1) && (folderRoute[indexEndFolderRoute] != '/')) {
+        indexEndFolderRoute--;
+    } // find the last '/'. If there is no '/', indexEndFolderRoute should be at the beginning
+    folderRoute[indexEndFolderRoute + 1] = '\0'; // cut the string. Now it contains only the folder position
+}
+
+void print_variables(double *variable, char *outputFileName, int Nx, int Ny, int Nz) {
+    printf("begin printing variable\n");
+    FILE *outputFile = NULL;
+    outputFile = fopen(outputFileName,"w");
+    int xIndex, yIndex, zIndex;
+    int globalIndex = 0;
+    fprintf(outputFile, "%d %d %d\n", Nx, Ny, Nz);
+    for (zIndex = 0; zIndex < Nz; zIndex++) {
+        for (yIndex = 0; yIndex < Ny; yIndex++) {
+            fprintf(outputFile, "%d %d\n", yIndex, zIndex);
+            for (xIndex = 0; xIndex < Nx; xIndex++) {
+                if ((xIndex + 1) % 4 == 0 || (xIndex == Nx - 1)) // new line every 4 values
+                    fprintf(outputFile, "%12.9f\n", variable[globalIndex]);
+                else
+                    fprintf(outputFile, "%12.9f ", variable[globalIndex]);
+                globalIndex++;
+            }
+        }
+    }
+    fclose(outputFile);
 }
