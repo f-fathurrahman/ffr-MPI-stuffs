@@ -101,7 +101,7 @@ OBJLIBS = initialization.o readfiles.o atomdata.o parallelization.o relax.o tool
         cyclix/cyclix_tools.o cyclix/cyclix_forces.o cyclix/cyclix_gradVec.o cyclix/cyclix_lapVec.o \
         cyclix/cyclix_stress.o \
 
-LIBBASE = ../lib/sparc
+LIBBASE = libsparc.a
 TESTBASE = ../.ci
 
 override CC=mpicc
@@ -124,6 +124,7 @@ main: lib
 
 .PHONY: clean
 clean:
-	rm -f  $(OBJSC) $(LIBBASE)
+	rm -f  $(OBJLIBS) $(LIBBASE)
+
 test: ../tests/SPARC_testing_script.py
 	cd ../tests; python SPARC_testing_script.py
