@@ -18,14 +18,19 @@ function main()
     ############################
 
     #dims = MPI.Dims_create(nprocs, 3)
-    dims = [0,0,0]                  # must be a Vector{Int}
-    MPI.Dims_create!(nprocs, 3, dims)    # fills dims in-place
-
+    #dims = [0,0,0]                  # must be a Vector{Int}
+    #MPI.Dims_create!(nprocs, 3, dims)    # fills dims in-place
     #cart = MPI.Cart_create(comm, dims; reorder=true, periods=(false,false,false))
+    #periods = [0, 0, 0]
+    #reorder = true
+    #cart = MPI.Cart_create(comm, dims, periods, reorder )
 
-    periods = [0, 0, 0]
-    reorder = true
-    cart = MPI.Cart_create(comm, dims, periods, reorder )
+    ndims = 3
+    dims = MPI.Dims_create(nprocs, zeros(Int64, ndims))
+
+    periods = ntuple(_ -> false, ndims)
+    cart = MPI.Cart_create(comm, dims, periodic=periods, reorder=true)
+
     coords = MPI.Cart_coords(cart, rank)
 
     Px, Py, Pz = dims
