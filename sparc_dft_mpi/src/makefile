@@ -75,7 +75,7 @@ CPPFLAGS += -DENABLE_SIMD_COMPLEX
 endif
 
 # for old Intel compiler, use -qopenmp instead of -fopenmp. ICC 17 and later also accepts -fopenmp. 
-CFLAGS = -std=gnu99 -O3 -fopenmp
+CFLAGS = -std=gnu99 -O3 -fPIC
 
 OBJLIBS = initialization.o readfiles.o atomdata.o parallelization.o relax.o tools.o md.o      \
         electrostatics.o electronicGroundState.o electronDensity.o orbitalElecDensInit.o           \
@@ -101,26 +101,25 @@ OBJLIBS = initialization.o readfiles.o atomdata.o parallelization.o relax.o tool
         cyclix/cyclix_tools.o cyclix/cyclix_forces.o cyclix/cyclix_gradVec.o cyclix/cyclix_lapVec.o \
         cyclix/cyclix_stress.o \
 
-LIBBASE = libsparc.a
-TESTBASE = ../.ci
+LIBBASE = libsparc.so
+
+# Must be hardcoded?
+LIB_SPARC_DIR = "/home/efefer/WORKS/my_github_repos/ffr-MPI-stuffs/sparc_dft_mpi/src"
 
 override CC=mpicc
-
-all: sparc
 
 # Note the implicit rule to compile '.c' files into '.o' files is
 # %.o : %.c
 # 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 lib: $(OBJLIBS)
-	rm -fv libsparc.a
-	ar rcs libsparc.a $(OBJLIBS)
+	$(CC) -shared -o libsparc.so $(OBJLIBS)
 
 main_debug: lib
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) -o main_debug.x main_debug.c libsparc.a $(LDLIBS)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) main_debug.c -Wl,-rpath ${LIB_SPARC_DIR} libsparc.so $(LDLIBS) -o main_debug.x
 
 main: lib 
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) -o main.x main.c libsparc.a $(LDLIBS)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) main.c -Wl,-rpath ${LIB_SPARC_DIR} libsparc.so $(LDLIBS) -o main.x
 
 .PHONY: clean
 clean:
