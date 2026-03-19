@@ -1,0 +1,5 @@
+[general]
+library_name = "libsparc"
+output_file_path = "./TEMP_LibSparc.jl"
+module_name = "LibSparc"
+jll_pkg_name = "SPARC_jll"
